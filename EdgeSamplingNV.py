@@ -3,7 +3,6 @@ import torch
 import torchvision
 import cv2
 
-
 from torch.utils.data import DataLoader
 from ProcessingConfig import ProcessingConfig
 from ImageProcessor import ImageProcessor
