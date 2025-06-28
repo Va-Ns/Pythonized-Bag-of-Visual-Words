@@ -62,15 +62,31 @@ class EdgeSamplingNV:
         score = []
         
         for batch in Dataloader:
-            # Get the input image tensor. Beware that this image tensor is 
-            # of shape (B, R, C) where B is the batch size, R is the rows, and C is the columns.
-            img, _ = batch 
+            
+            """
+                Get the input image tensor. 
+                Beware that this image tensor is of shape (B, R, C) where:
+                 -B is the batch size,
+                 -R is the rows, and
+                 -C is the columns.
 
-            # Iterate through each image in the batch and apply to it the vgg_xcv_segment function. 
-            for i in range(img.shape[0]):
+            """
 
-                curves = vgg_xcv_segment(img[i], action = "canny_edges")
-        
+            # Get the number of images in the batch
+            num_imgs, _ = batch
+
+            # Iterate through each image in the batch and apply to it the vgg_xcv_segment function.
+            for i in range(num_imgs.shape[0]):
+
+                curves = vgg_xcv_segment(num_imgs[i], action = "canny_edges")
+
+                # Concatenate all edgel segments together into one big array
+                
+                for i in range(len(curves)):
+                    
+                  xx.append(curves[i][0,:])  
+                    
+                    
                 
 
         

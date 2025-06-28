@@ -16,7 +16,7 @@ def parse_xcv_output(x, action):
             Parse the numeric output from xcv_segment according to the action.
             Returns: s (parsed structure)
         """
-        c = 0  # Python uses 0-based indexing
+        c = 0  
         s = None
 
         if action == 'corners':
@@ -214,12 +214,12 @@ def vgg_xcv_segment(Img: torch.Tensor, action: str, Options: str = ''):
 
         # Remove the output file
         os.remove(outname)
-
+        
         return s
+
+        
 
     except:
 
         print("Error reading output file")
         content = None
-
-    
