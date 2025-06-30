@@ -38,11 +38,7 @@ def main():
     
     Edge_Sampling.Edge_sampling(Train_loader)
     
-    # Process a sample image
-    image, _ = next(iter(Train_loader))
-    img_display = image.squeeze(0).numpy()
-    plt.imshow(img_display, cmap='gray')
-    plt.show()
+    
 
 if __name__ == "__main__":
     main()

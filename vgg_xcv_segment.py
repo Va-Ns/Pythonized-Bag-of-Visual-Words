@@ -152,7 +152,6 @@ def vgg_xcv_segment(Img: torch.Tensor, action: str, Options: str = ''):
     
     # Convert the image to PIL format. This is necessary
     # because the vgg_xcv_segment function expects a png image
-    
     Img_pil = F.to_pil_image(Img)
     Img_pil.save(inname, format='PNG')
     
@@ -216,8 +215,6 @@ def vgg_xcv_segment(Img: torch.Tensor, action: str, Options: str = ''):
         os.remove(outname)
         
         return s
-
-        
 
     except:
 

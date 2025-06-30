@@ -54,6 +54,7 @@ class ImageProcessor:
         """Creates a DataLoader for the image dataset"""
         
         dataset = datasets.ImageFolder(
+            
             root = image_dir,
             transform = self.transform
         )
