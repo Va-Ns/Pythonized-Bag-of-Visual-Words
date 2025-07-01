@@ -57,7 +57,7 @@ class EdgeSamplingNV:
                f"Scale={self.Scale}, Weighted_Sampling={self.Weighted_Sampling}, " \
                f"WorkspaceDir={self.WorkspaceDir}, Plot={self.Plot})"
     
-    def Edge_sampling(self, Dataloader):
+    def Edge_Sampling(self, Dataloader):
 
         x, y, scale, score, interest_point  = [], [], [], [], []
         xx = np.empty((1, 0))

@@ -29,14 +29,16 @@ def main():
         "Quantized_vector_descriptors",
         "SIFT_features_of_interest_points"
     ]
-    Processor.setup_subdirs(subdirs)
+    Processor.Setup_subdirs(subdirs)
     
     # Create the data loader
-    Train_loader = Processor.create_dataloader(base_dir / "images")
+    Train_loader = Processor.Create_dataloader(base_dir / "images")
 
+    # Create EdgeSamplingNV instance
     Edge_Sampling = EdgeSamplingNV(Train_loader, Config)
     
-    Edge_Sampling.Edge_sampling(Train_loader)
+    # Assign the results of the edge sampling
+    Variables = Edge_Sampling.Edge_Sampling(Train_loader)
     
     
 
