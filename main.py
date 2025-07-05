@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 from pathlib import Path                                # We import Path to create the directory structure
 from torchvision import datasets                        # We import datasets to load the dataset  
 from torch.utils.data import DataLoader, random_split   # We import random_split and DataLoader to split the dataset into 
@@ -8,8 +9,8 @@ from torchvision.transforms import v2 as transforms     # We import transforms t
 from EdgeSamplingNV import EdgeSamplingNV               # We import the EdgeSamplingNV class from the EdgeSamplingNV module
 from ProcessingConfig import ProcessingConfig           # We import the ProcessingConfig class from the ProcessingConfig module
 from ImageProcessor import ImageProcessor               # We import the ImageProcessor class from the ImageProcessor module
-
-
+from timeit import default_timer as timer               # We import timer to measure the time taken for edge sampling
+from ExtractSIFTFeatures import ExtractSIFTFeatures     # We import the ExtractSIFTFeatures function from the ExtractSIFTFeatures module
 
 def main():
     
@@ -37,10 +38,17 @@ def main():
     # Create EdgeSamplingNV instance
     Edge_Sampling = EdgeSamplingNV(Train_loader, Config)
     
+    start = timer()
     # Assign the results of the edge sampling
     Variables = Edge_Sampling.Edge_Sampling(Train_loader)
-    
-    
+    end = timer()
+    print(f"Edge sampling took a mean time of {(end - start)/len(Train_loader.dataset):.2f} seconds.")
+
+    start = timer()
+    # Extract SIFT features (The data of the Train_loader are not resuffled)
+    Features = ExtractSIFTFeatures(Train_loader, Variables)
+    end = timer()
+    print(f"SIFT feature extraction took a mean time of {(end - start)/len(Train_loader.dataset):.2f} seconds.")
 
 if __name__ == "__main__":
     main()

@@ -14,6 +14,7 @@ from numpy.random import rand
 from pathlib import Path
 
 
+
 class EdgeSamplingNV: 
     
     # --------------------------------Class Definition-----------------------------
