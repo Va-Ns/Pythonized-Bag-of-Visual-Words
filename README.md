@@ -10,7 +10,7 @@ This repository is actively being developed. Some features are still being imple
 ## Project Highlights
 
 - **Feature Extraction**: Uses SIFT (Scale-Invariant Feature Transform) for detecting points of interest
-- **Edge Detection**: Implements Canny edge detection through the [`vgg_xcv_segment`](vgg_xcv_segment.py) function
+- **Edge Detection**: Implements Canny edge detection through the [`vgg_xcv_segment`](vgg_xcv_segment.py) executable
 - **Data Processing**: Utilizes PyTorch's [`DataLoader`](ImageProcessor.py) for efficient batch processing
 - **Modern Python Stack**: Built with NumPy, PyTorch, and OpenCV
 
