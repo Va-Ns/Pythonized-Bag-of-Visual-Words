@@ -33,7 +33,7 @@ class ImageProcessor:
                             
                           ])
             
-    def Setup_subdirs(self, subdirs: List[str]) -> None:
+    def Setup_subdirs(self, subdirs: List[str]) -> None | List[Path]:
         
         """Sets up workspace subdirectories"""
         
@@ -44,10 +44,14 @@ class ImageProcessor:
 
         else:
             
+            subdir_path = []
             for subdir in subdirs:
                 
                 dir_path = self.config.Workspace_dir / subdir
                 dir_path.mkdir(exist_ok = True)
+                subdir_path.append(dir_path)
+
+            return subdir_path
             
     def Create_dataloader(self, image_dir: Path) -> DataLoader:
         
