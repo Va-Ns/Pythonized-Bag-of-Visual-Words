@@ -46,7 +46,7 @@ def main():
 
     start = timer()
     # Extract SIFT features (The data of the Train_loader are not resuffled)
-    Features = ExtractSIFTFeatures(Train_loader, Variables)
+    Features = ExtractSIFTFeatures(Train_loader, Variables, plot = True)
     end = timer()
     print(f"SIFT feature extraction took a mean time of {(end - start)/len(Train_loader.dataset):.2f} seconds.")
 
