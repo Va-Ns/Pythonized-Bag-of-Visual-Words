@@ -2,11 +2,6 @@
 
 This project is a Python implementation of the Bag of Visual Words model, inspired by the MATLAB code from the [ICCV of 2005](https://people.csail.mit.edu/fergus/iccv2005/bagwords.html). It's currently a work in progress, with some components still being translated from MATLAB to Python.
 
-## Project Status
-
-⚠️ **Work in Progress** ⚠️
-This repository is actively being developed. Some features are still being implemented and tested.
-
 ## Project Highlights
 
 - **Feature Extraction**: Uses SIFT (Scale-Invariant Feature Transform) for detecting points of interest
