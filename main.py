@@ -1,19 +1,22 @@
 import matplotlib.pyplot as plt
-import numpy as np                                          # We import numpy for numerical operations
+import numpy as np                                                           # We import numpy for numerical operations
 
-from pathlib import Path                                   # We import Path to create the directory structure
-from torchvision import datasets                           # We import datasets to load the dataset  
-from torch.utils.data import DataLoader, random_split      # We import random_split and DataLoader to split the dataset into 
-                                                           # training and validation sets and load the dataset
-from torchvision.transforms import v2 as transforms        # We import transforms to apply transformations to the images
-from EdgeSamplingNV import EdgeSamplingNV                  # We import the EdgeSamplingNV class from the EdgeSamplingNV module
-from ProcessingConfig import ProcessingConfig              # We import the ProcessingConfig class from the ProcessingConfig module
-from ImageProcessor import ImageProcessor                  # We import the ImageProcessor class from the ImageProcessor module
-from timeit import default_timer as timer                  # We import timer to measure the time taken for edge sampling
-from ExtractSIFTFeatures import ExtractSIFTFeatures        # We import the ExtractSIFTFeatures function from the ExtractSIFTFeatures module
-from torch import Generator                                # We import Generator to set the random seed for reproducibility
-from sklearn.cluster import KMeans                         # We import KMeans for clustering the SIFT features
-from sklearn.metrics import pairwise_distances_argmin_min  # We import pairwise_distances_argmin_min to find the closest cluster center for each feature
+from pathlib import Path                                                     # We import Path to create the directory structure
+from torchvision import datasets                                             # We import datasets to load the dataset  
+from torch.utils.data import DataLoader, random_split                        # We import random_split and DataLoader to split the dataset into 
+                                                                             # training and validation sets and load the dataset
+from torchvision.transforms import v2 as transforms                          # We import transforms to apply transformations to the images
+from EdgeSamplingNV import EdgeSamplingNV                                    # We import the EdgeSamplingNV class from the EdgeSamplingNV module
+from ProcessingConfig import ProcessingConfig                                # We import the ProcessingConfig class from the ProcessingConfig module
+from ImageProcessor import ImageProcessor                                    # We import the ImageProcessor class from the ImageProcessor module
+from timeit import default_timer as timer                                    # We import timer to measure the time taken for edge sampling
+from ExtractSIFTFeatures import ExtractSIFTFeatures                          # We import the ExtractSIFTFeatures function from the ExtractSIFTFeatures module
+from torch import Generator                                                  # We import Generator to set the random seed for reproducibility
+from sklearn.cluster import KMeans                                           # We import KMeans for clustering the SIFT features
+from sklearn.metrics import pairwise_distances_argmin_min, accuracy_score    # We import pairwise_distances_argmin_min to find the closest cluster center for each feature
+from sklearn import svm                                                      # We import svm for building the classifier
+from sklearn import preprocessing                                            # We import preprocessing for data standardization 
+from sklearn.model_selection import GridSearchCV
 
 
 def main():
@@ -71,19 +74,18 @@ def main():
     Descriptors = np.vstack(Descriptors)
     
     # Instantiate the KMeans clustering algorithm
-    kmeans = KMeans(n_clusters = 300, init = 'k-means++', n_init='auto',max_iter = 10).fit(Descriptors)
+    kmeans = KMeans(n_clusters = 300, init = 'k-means++', n_init='auto').fit(Descriptors)
     
     # Formate the Codebook
     Codebook = kmeans.cluster_centers_
     
     # Instantiate the lists of the quantized vector descriptors
-
     Training_vq_descriptors  = np.zeros((len(Train_dataset), Codebook.shape[0]))
     Testing_vq_descriptors  = np.zeros((len(Test_dataset), Codebook.shape[0]))
 
     for img_descriptor in range(len(Train_dataset)):
 
-        index, _ = pairwise_distances_argmin_min(Codebook, Features[Train_dataset.indices[img_descriptor]])
+        index, _ = pairwise_distances_argmin_min(Features[Train_dataset.indices[img_descriptor]], Codebook)
         hist, _ = np.histogram(index, bins = Codebook.shape[0])
 
         Training_vq_descriptors[img_descriptor, :] = hist / len(index)
@@ -101,6 +103,43 @@ def main():
     np.save(subdir_paths[1] / "Testing_vq_descriptors.npy", Testing_vq_descriptors)
     np.save(subdir_paths[2] / "SIFT_features_of_interest_points.npy", Features)
     
+    # Get the targets and indices for training and testing datasets
+    Training_targets = np.array(Train_dataset.dataset.targets)
+    Training_indices = np.array(Train_dataset.indices)
     
+    # Get the targets and indices for testing dataset
+    Testing_targets = np.array(Test_dataset.dataset.targets)
+    Testing_indices = np.array(Test_dataset.indices)
+    
+    # Before the formation of the classifier, try to standardize the data
+    scaler = preprocessing.MaxAbsScaler().fit(Training_vq_descriptors)
+    
+    Training_vq_descriptors = scaler.transform(Training_vq_descriptors)
+    Testing_vq_descriptors = scaler.transform(Testing_vq_descriptors)
+    
+    # Define the parameter grid for the SVM classifier
+    param_grid = {
+    'kernel': ['linear','rbf'],
+    'C': [0.1, 1, 10, 100],
+    'gamma': ['scale','auto']
+    }
+    
+    # Build the classifier using GridSearchCV
+    # This will perform a grid search over the specified parameters
+    grid = GridSearchCV(svm.SVC(max_iter=5000, break_ties=True), param_grid,
+                    cv=5, verbose=2, n_jobs=-1)
+    grid.fit(Training_vq_descriptors, Training_targets[Training_indices])
+    
+    # Extract the best estimator from the grid search
+    best_clf = grid.best_estimator_
+
+    # Perform predictions on the test set
+    y_pred = best_clf.predict(Testing_vq_descriptors)
+    y_true = Testing_targets[Testing_indices]
+    
+    Accuracy = accuracy_score(y_true, y_pred)
+    print(f"\nThe accuracy of the classifier is {Accuracy:.2f}.\n")
+
+
 if __name__ == "__main__":
     main()
